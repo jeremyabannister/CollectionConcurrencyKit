@@ -6,6 +6,7 @@
 
 // MARK: - ForEach
 
+@available(iOS 13.0, macOS 10.15.0, watchOS 6, tvOS 13, *)
 public extension Sequence {
     /// Run an async closure for each element within the sequence.
     ///
@@ -79,6 +80,7 @@ public extension Sequence {
 
 // MARK: - Map
 
+@available(iOS 13.0, macOS 10.15.0, watchOS 6, tvOS 13, *)
 public extension Sequence {
     /// Transform the sequence into an array of new values using
     /// an async closure.
@@ -166,6 +168,7 @@ public extension Sequence {
 
 // MARK: - CompactMap
 
+@available(iOS 13.0, macOS 10.15.0, watchOS 6, tvOS 13, *)
 public extension Sequence {
     /// Transform the sequence into an array of new values using
     /// an async closure that returns optional values. Only the
@@ -263,6 +266,7 @@ public extension Sequence {
 
 // MARK: - FlatMap
 
+@available(iOS 13.0, macOS 10.15.0, watchOS 6, tvOS 13, *)
 public extension Sequence {
     /// Transform the sequence into an array of new values using
     /// an async closure that returns sequences. The returned sequences
