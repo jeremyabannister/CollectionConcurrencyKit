@@ -360,3 +360,28 @@ public extension Sequence {
         }
     }
 }
+
+
+// MARK: - Reduce
+
+@available(iOS 13.0, macOS 10.15.0, watchOS 6, tvOS 13, *)
+public extension Sequence {
+    
+    ///
+    func asyncReduce
+        <Result>
+        (into initialResult: Result,
+         _ updateAccumulatingResult: (inout Result, Element)async throws->())
+    async rethrows -> Result {
+        
+        ///
+        var accumulation: Result = initialResult
+        
+        ///
+        for element in self {
+            try await updateAccumulatingResult(&accumulation, element)
+        }
+
+        return accumulation
+    }
+}
