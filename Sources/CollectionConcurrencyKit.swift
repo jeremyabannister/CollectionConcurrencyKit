@@ -6,8 +6,9 @@
 
 // MARK: - ForEach
 
+///
 @available(iOS 13.0, macOS 10.15.0, watchOS 6, tvOS 13, *)
-public extension Sequence {
+extension Sequence {
     /// Run an async closure for each element within the sequence.
     ///
     /// The closure calls will be performed in order, by waiting for
@@ -17,10 +18,14 @@ public extension Sequence {
     ///
     /// - parameter operation: The closure to run for each element.
     /// - throws: Rethrows any error thrown by the passed closure.
-    func asyncForEach(
+    public func asyncForEach(
         _ operation: (Element) async throws -> Void
     ) async rethrows {
+        
+        ///
         for element in self {
+            
+            ///
             try await operation(element)
         }
     }
@@ -35,12 +40,18 @@ public extension Sequence {
     ///   the async tasks that will perform the closure calls. The
     ///   default is `nil` (meaning that the system picks a priority).
     /// - parameter operation: The closure to run for each element.
-    func concurrentForEach(
+    public func concurrentForEach(
         withPriority priority: TaskPriority? = nil,
         _ operation: @escaping (Element) async -> Void
     ) async {
+        
+        ///
         await withTaskGroup(of: Void.self) { group in
+            
+            ///
             for element in self {
+                
+                ///
                 group.addTask(priority: priority) {
                     await operation(element)
                 }
@@ -61,18 +72,24 @@ public extension Sequence {
     ///   default is `nil` (meaning that the system picks a priority).
     /// - parameter operation: The closure to run for each element.
     /// - throws: Rethrows any error thrown by the passed closure.
-    func concurrentForEach(
+    public func concurrentForEach(
         withPriority priority: TaskPriority? = nil,
         _ operation: @escaping (Element) async throws -> Void
     ) async throws {
+        
+        ///
         try await withThrowingTaskGroup(of: Void.self) { group in
+            
+            ///
             for element in self {
+                
+                ///
                 group.addTask(priority: priority) {
                     try await operation(element)
                 }
             }
 
-            // Propagate any errors thrown by the group's tasks:
+            /// Propagate any errors thrown by the group's tasks:
             for try await _ in group {}
         }
     }
@@ -80,8 +97,10 @@ public extension Sequence {
 
 // MARK: - Map
 
+///
 @available(iOS 13.0, macOS 10.15.0, watchOS 6, tvOS 13, *)
-public extension Sequence {
+extension Sequence {
+    
     /// Transform the sequence into an array of new values using
     /// an async closure.
     ///
@@ -94,15 +113,22 @@ public extension Sequence {
     /// - returns: The transformed values as an array. The order of
     ///   the transformed values will match the original sequence.
     /// - throws: Rethrows any error thrown by the passed closure.
-    func asyncMap<T>(
+    public func asyncMap<T>(
         _ transform: (Element) async throws -> T
     ) async rethrows -> [T] {
+        
+        ///
         var values = [T]()
-
+        
+        ///
         for element in self {
-            try await values.append(transform(element))
+            try await values
+                .append(
+                    transform(element)
+                )
         }
-
+        
+        ///
         return values
     }
 
@@ -119,19 +145,25 @@ public extension Sequence {
     /// - parameter transform: The transform to run on each element.
     /// - returns: The transformed values as an array. The order of
     ///   the transformed values will match the original sequence.
-    func concurrentMap<T>(
+    public func concurrentMap<T>(
         withPriority priority: TaskPriority? = nil,
         _ transform: @escaping (Element) async -> T
     ) async -> [T] {
-        let tasks = map { element in
-            Task(priority: priority) {
-                await transform(element)
+        
+        ///
+        let tasks =
+            self.map { element in
+                Task(priority: priority) {
+                    await transform(element)
+                }
             }
-        }
-
-        return await tasks.asyncMap { task in
-            await task.value
-        }
+        
+        ///
+        return
+            await tasks
+                .asyncMap { task in
+                    await task.value
+                }
     }
 
     /// Transform the sequence into an array of new values using
@@ -150,26 +182,34 @@ public extension Sequence {
     /// - returns: The transformed values as an array. The order of
     ///   the transformed values will match the original sequence.
     /// - throws: Rethrows any error thrown by the passed closure.
-    func concurrentMap<T>(
+    public func concurrentMap<T>(
         withPriority priority: TaskPriority? = nil,
         _ transform: @escaping (Element) async throws -> T
     ) async throws -> [T] {
-        let tasks = map { element in
-            Task(priority: priority) {
-                try await transform(element)
+        
+        ///
+        let tasks =
+            self.map { element in
+                Task(priority: priority) {
+                    try await transform(element)
+                }
             }
-        }
-
-        return try await tasks.asyncMap { task in
-            try await task.value
-        }
+        
+        ///
+        return
+            try await tasks
+                .asyncMap { task in
+                    try await task.value
+                }
     }
 }
 
 // MARK: - CompactMap
 
+///
 @available(iOS 13.0, macOS 10.15.0, watchOS 6, tvOS 13, *)
-public extension Sequence {
+extension Sequence {
+    
     /// Transform the sequence into an array of new values using
     /// an async closure that returns optional values. Only the
     /// non-`nil` return values will be included in the new array.
@@ -184,19 +224,26 @@ public extension Sequence {
     ///   the transformed values will match the original sequence,
     ///   except for the values that were transformed into `nil`.
     /// - throws: Rethrows any error thrown by the passed closure.
-    func asyncCompactMap<T>(
+    public func asyncCompactMap<T>(
         _ transform: (Element) async throws -> T?
     ) async rethrows -> [T] {
+        
+        ///
         var values = [T]()
-
+        
+        ///
         for element in self {
+            
+            ///
             guard let value = try await transform(element) else {
                 continue
             }
-
+            
+            ///
             values.append(value)
         }
-
+        
+        ///
         return values
     }
 
@@ -215,19 +262,25 @@ public extension Sequence {
     /// - returns: The transformed values as an array. The order of
     ///   the transformed values will match the original sequence,
     ///   except for the values that were transformed into `nil`.
-    func concurrentCompactMap<T>(
+    public func concurrentCompactMap<T>(
         withPriority priority: TaskPriority? = nil,
         _ transform: @escaping (Element) async -> T?
     ) async -> [T] {
-        let tasks = map { element in
-            Task(priority: priority) {
-                await transform(element)
+        
+        ///
+        let tasks =
+            self.map { element in
+                Task(priority: priority) {
+                    await transform(element)
+                }
             }
-        }
-
-        return await tasks.asyncCompactMap { task in
-            await task.value
-        }
+        
+        ///
+        return
+            await tasks
+                .asyncCompactMap { task in
+                    await task.value
+                }
     }
 
     /// Transform the sequence into an array of new values using
@@ -248,26 +301,34 @@ public extension Sequence {
     ///   the transformed values will match the original sequence,
     ///   except for the values that were transformed into `nil`.
     /// - throws: Rethrows any error thrown by the passed closure.
-    func concurrentCompactMap<T>(
+    public func concurrentCompactMap<T>(
         withPriority priority: TaskPriority? = nil,
         _ transform: @escaping (Element) async throws -> T?
     ) async throws -> [T] {
-        let tasks = map { element in
-            Task(priority: priority) {
-                try await transform(element)
+        
+        ///
+        let tasks =
+            self.map { element in
+                Task(priority: priority) {
+                    try await transform(element)
+                }
             }
-        }
-
-        return try await tasks.asyncCompactMap { task in
-            try await task.value
-        }
+        
+        ///
+        return
+            try await tasks
+                .asyncCompactMap { task in
+                    try await task.value
+                }
     }
 }
 
 // MARK: - FlatMap
 
+///
 @available(iOS 13.0, macOS 10.15.0, watchOS 6, tvOS 13, *)
-public extension Sequence {
+extension Sequence {
+    
     /// Transform the sequence into an array of new values using
     /// an async closure that returns sequences. The returned sequences
     /// will be flattened into the array returned from this function.
@@ -283,15 +344,24 @@ public extension Sequence {
     ///   with the results of each closure call appearing in-order
     ///   within the returned array.
     /// - throws: Rethrows any error thrown by the passed closure.
-    func asyncFlatMap<T: Sequence>(
+    public func asyncFlatMap<T: Sequence>(
         _ transform: (Element) async throws -> T
     ) async rethrows -> [T.Element] {
+        
+        ///
         var values = [T.Element]()
-
+        
+        ///
         for element in self {
-            try await values.append(contentsOf: transform(element))
+            
+            ///
+            try await values
+                .append(
+                    contentsOf: transform(element)
+                )
         }
-
+        
+        ///
         return values
     }
 
@@ -311,19 +381,27 @@ public extension Sequence {
     ///   the transformed values will match the original sequence,
     ///   with the results of each closure call appearing in-order
     ///   within the returned array.
-    func concurrentFlatMap<T: Sequence>(
+    public func concurrentFlatMap<
+        T: Sequence
+    >(
         withPriority priority: TaskPriority? = nil,
         _ transform: @escaping (Element) async -> T
     ) async -> [T.Element] {
-        let tasks = map { element in
-            Task(priority: priority) {
-                await transform(element)
+        
+        ///
+        let tasks =
+            self.map { element in
+                Task(priority: priority) {
+                    await transform(element)
+                }
             }
-        }
-
-        return await tasks.asyncFlatMap { task in
-            await task.value
-        }
+        
+        ///
+        return
+            await tasks
+                .asyncFlatMap { task in
+                    await task.value
+                }
     }
 
     /// Transform the sequence into an array of new values using
@@ -345,34 +423,42 @@ public extension Sequence {
     ///   with the results of each closure call appearing in-order
     ///   within the returned array.
     /// - throws: Rethrows any error thrown by the passed closure.
-    func concurrentFlatMap<T: Sequence>(
+    public func concurrentFlatMap<T: Sequence>(
         withPriority priority: TaskPriority? = nil,
         _ transform: @escaping (Element) async throws -> T
     ) async throws -> [T.Element] {
-        let tasks = map { element in
-            Task(priority: priority) {
-                try await transform(element)
+        
+        ///
+        let tasks =
+            self.map { element in
+                Task(priority: priority) {
+                    try await transform(element)
+                }
             }
-        }
-
-        return try await tasks.asyncFlatMap { task in
-            try await task.value
-        }
+        
+        ///
+        return
+            try await tasks
+                .asyncFlatMap { task in
+                    try await task.value
+                }
     }
 }
 
 
 // MARK: - Reduce
 
+///
 @available(iOS 13.0, macOS 10.15.0, watchOS 6, tvOS 13, *)
-public extension Sequence {
+extension Sequence {
     
     ///
-    func asyncReduce
-        <Result>
-        (into initialResult: Result,
-         _ updateAccumulatingResult: (inout Result, Element)async throws->())
-    async rethrows -> Result {
+    public func asyncReduce<
+        Result
+    >(
+        into initialResult: Result,
+        _ updateAccumulatingResult: (inout Result, Element)async throws->()
+    ) async rethrows -> Result {
         
         ///
         var accumulation: Result = initialResult
