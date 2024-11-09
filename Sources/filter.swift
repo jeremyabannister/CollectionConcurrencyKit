@@ -8,7 +8,7 @@
 // MARK: - Filter
 
 @available(iOS 13.0, macOS 10.15.0, watchOS 6, tvOS 13, *)
-extension Sequence {
+extension Sequence where Element: Sendable {
     
     ///
     public func asyncFilter(
@@ -26,7 +26,7 @@ extension Sequence {
     ///
     public func concurrentFilter(
         withPriority priority: TaskPriority? = nil,
-        _ operation: @escaping (Element)async->Bool
+        _ operation: @escaping @Sendable (Element)async->Bool
     ) async -> Array<Element> {
         
         ///
@@ -40,7 +40,7 @@ extension Sequence {
     ///
     public func concurrentFilter(
         withPriority priority: TaskPriority? = nil,
-        _ operation: @escaping (Element)async throws->Bool
+        _ operation: @escaping @Sendable (Element)async throws->Bool
     ) async throws -> Array<Element> {
         
         ///

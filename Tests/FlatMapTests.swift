@@ -8,8 +8,8 @@ import XCTest
 import CollectionConcurrencyKit
 
 final class FlatMapTests: TestCase {
-    func testNonThrowingAsyncFlatMap() {
-        runAsyncTest { array, collector in
+    func testNonThrowingAsyncFlatMap() async {
+        await runAsyncTest { array, collector in
             let values = await array.asyncFlatMap {
                 await collector.collectAndDuplicate($0)
             }
@@ -18,8 +18,8 @@ final class FlatMapTests: TestCase {
         }
     }
 
-    func testThrowingAsyncFlatMapThatDoesNotThrow() {
-        runAsyncTest { array, collector in
+    func testThrowingAsyncFlatMapThatDoesNotThrow() async {
+        await runAsyncTest { array, collector in
             let values = try await array.asyncFlatMap {
                 try await collector.tryCollectAndDuplicate($0)
             }
@@ -28,8 +28,8 @@ final class FlatMapTests: TestCase {
         }
     }
 
-    func testThrowingAsyncFlatMapThatThrows() {
-        runAsyncTest { array, collector in
+    func testThrowingAsyncFlatMapThatThrows() async {
+        await runAsyncTest { array, collector in
             await self.verifyErrorThrown { error in
                 try await array.asyncFlatMap { int in
                     try await collector.tryCollectAndDuplicate(
@@ -43,8 +43,8 @@ final class FlatMapTests: TestCase {
         }
     }
 
-    func testNonThrowingConcurrentFlatMap() {
-        runAsyncTest { array, collector in
+    func testNonThrowingConcurrentFlatMap() async {
+        await runAsyncTest { array, collector in
             let values = await array.concurrentFlatMap {
                 await collector.collectAndDuplicate($0)
             }
@@ -53,8 +53,8 @@ final class FlatMapTests: TestCase {
         }
     }
 
-    func testThrowingConcurrentFlatMapThatDoesNotThrow() {
-        runAsyncTest { array, collector in
+    func testThrowingConcurrentFlatMapThatDoesNotThrow() async {
+        await runAsyncTest { array, collector in
             let values = try await array.concurrentFlatMap {
                 try await collector.tryCollectAndDuplicate($0)
             }
@@ -63,8 +63,8 @@ final class FlatMapTests: TestCase {
         }
     }
 
-    func testThrowingConcurrentFlatMapThatThrows() {
-        runAsyncTest { array, collector in
+    func testThrowingConcurrentFlatMapThatThrows() async {
+        await runAsyncTest { array, collector in
             await self.verifyErrorThrown { error in
                 try await array.concurrentFlatMap { int in
                     try await collector.tryCollectAndDuplicate(

@@ -8,7 +8,7 @@
 
 ///
 @available(iOS 13.0, macOS 10.15.0, watchOS 6, tvOS 13, *)
-extension Sequence {
+extension Sequence where Element: Sendable {
     /// Run an async closure for each element within the sequence.
     ///
     /// The closure calls will be performed in order, by waiting for
@@ -42,7 +42,7 @@ extension Sequence {
     /// - parameter operation: The closure to run for each element.
     public func concurrentForEach(
         withPriority priority: TaskPriority? = nil,
-        _ operation: @escaping (Element) async -> Void
+        _ operation: @escaping @Sendable (Element) async -> Void
     ) async {
         
         ///
@@ -74,7 +74,7 @@ extension Sequence {
     /// - throws: Rethrows any error thrown by the passed closure.
     public func concurrentForEach(
         withPriority priority: TaskPriority? = nil,
-        _ operation: @escaping (Element) async throws -> Void
+        _ operation: @escaping @Sendable (Element) async throws -> Void
     ) async throws {
         
         ///
@@ -99,7 +99,7 @@ extension Sequence {
 
 ///
 @available(iOS 13.0, macOS 10.15.0, watchOS 6, tvOS 13, *)
-extension Sequence {
+extension Sequence where Element: Sendable {
     
     /// Transform the sequence into an array of new values using
     /// an async closure.
@@ -145,9 +145,9 @@ extension Sequence {
     /// - parameter transform: The transform to run on each element.
     /// - returns: The transformed values as an array. The order of
     ///   the transformed values will match the original sequence.
-    public func concurrentMap<T>(
+    public func concurrentMap<T: Sendable>(
         withPriority priority: TaskPriority? = nil,
-        _ transform: @escaping (Element) async -> T
+        _ transform: @escaping @Sendable (Element) async -> T
     ) async -> [T] {
         
         ///
@@ -182,9 +182,9 @@ extension Sequence {
     /// - returns: The transformed values as an array. The order of
     ///   the transformed values will match the original sequence.
     /// - throws: Rethrows any error thrown by the passed closure.
-    public func concurrentMap<T>(
+    public func concurrentMap<T: Sendable>(
         withPriority priority: TaskPriority? = nil,
-        _ transform: @escaping (Element) async throws -> T
+        _ transform: @escaping @Sendable (Element) async throws -> T
     ) async throws -> [T] {
         
         ///
@@ -208,7 +208,7 @@ extension Sequence {
 
 ///
 @available(iOS 13.0, macOS 10.15.0, watchOS 6, tvOS 13, *)
-extension Sequence {
+extension Sequence where Element: Sendable {
     
     /// Transform the sequence into an array of new values using
     /// an async closure that returns optional values. Only the
@@ -262,9 +262,9 @@ extension Sequence {
     /// - returns: The transformed values as an array. The order of
     ///   the transformed values will match the original sequence,
     ///   except for the values that were transformed into `nil`.
-    public func concurrentCompactMap<T>(
+    public func concurrentCompactMap<T: Sendable>(
         withPriority priority: TaskPriority? = nil,
-        _ transform: @escaping (Element) async -> T?
+        _ transform: @escaping @Sendable (Element) async -> T?
     ) async -> [T] {
         
         ///
@@ -301,9 +301,9 @@ extension Sequence {
     ///   the transformed values will match the original sequence,
     ///   except for the values that were transformed into `nil`.
     /// - throws: Rethrows any error thrown by the passed closure.
-    public func concurrentCompactMap<T>(
+    public func concurrentCompactMap<T: Sendable>(
         withPriority priority: TaskPriority? = nil,
-        _ transform: @escaping (Element) async throws -> T?
+        _ transform: @escaping @Sendable (Element) async throws -> T?
     ) async throws -> [T] {
         
         ///
@@ -327,7 +327,7 @@ extension Sequence {
 
 ///
 @available(iOS 13.0, macOS 10.15.0, watchOS 6, tvOS 13, *)
-extension Sequence {
+extension Sequence where Element: Sendable {
     
     /// Transform the sequence into an array of new values using
     /// an async closure that returns sequences. The returned sequences
@@ -382,10 +382,10 @@ extension Sequence {
     ///   with the results of each closure call appearing in-order
     ///   within the returned array.
     public func concurrentFlatMap<
-        T: Sequence
+        T: Sequence & Sendable
     >(
         withPriority priority: TaskPriority? = nil,
-        _ transform: @escaping (Element) async -> T
+        _ transform: @escaping @Sendable (Element) async -> T
     ) async -> [T.Element] {
         
         ///
@@ -423,9 +423,9 @@ extension Sequence {
     ///   with the results of each closure call appearing in-order
     ///   within the returned array.
     /// - throws: Rethrows any error thrown by the passed closure.
-    public func concurrentFlatMap<T: Sequence>(
+    public func concurrentFlatMap<T: Sequence & Sendable>(
         withPriority priority: TaskPriority? = nil,
-        _ transform: @escaping (Element) async throws -> T
+        _ transform: @escaping @Sendable (Element) async throws -> T
     ) async throws -> [T.Element] {
         
         ///

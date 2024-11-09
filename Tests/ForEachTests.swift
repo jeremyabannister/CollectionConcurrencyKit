@@ -8,22 +8,22 @@ import XCTest
 import CollectionConcurrencyKit
 
 final class ForEachTests: TestCase {
-    func testNonThrowingAsyncForEach() {
-        runAsyncTest { array, collector in
+    func testNonThrowingAsyncForEach() async {
+        await runAsyncTest { array, collector in
             await array.asyncForEach { await collector.collect($0) }
             XCTAssertEqual(collector.values, array)
         }
     }
 
-    func testThrowingAsyncForEachThatDoesNotThrow() {
-        runAsyncTest { array, collector in
+    func testThrowingAsyncForEachThatDoesNotThrow() async {
+        await runAsyncTest { array, collector in
             try await array.asyncForEach { try await collector.tryCollect($0) }
             XCTAssertEqual(collector.values, array)
         }
     }
 
-    func testThrowingAsyncForEachThatThrows() {
-        runAsyncTest { array, collector in
+    func testThrowingAsyncForEachThatThrows() async {
+        await runAsyncTest { array, collector in
             await self.verifyErrorThrown { error in
                 try await array.asyncForEach { int in
                     try await collector.tryCollect(
@@ -37,22 +37,22 @@ final class ForEachTests: TestCase {
         }
     }
 
-    func testNonThrowingConcurrentForEach() {
-        runAsyncTest { array, collector in
+    func testNonThrowingConcurrentForEach() async {
+        await runAsyncTest { array, collector in
             await array.concurrentForEach { await collector.collect($0) }
             XCTAssertEqual(collector.values.sorted(), array)
         }
     }
 
-    func testThrowingConcurrentForEachThatDoesNotThrow() {
-        runAsyncTest { array, collector in
+    func testThrowingConcurrentForEachThatDoesNotThrow() async {
+        await runAsyncTest { array, collector in
             try await array.concurrentForEach { try await collector.tryCollect($0) }
             XCTAssertEqual(collector.values.sorted(), array)
         }
     }
 
-    func testThrowingConcurrentForEachThatThrows() {
-        runAsyncTest { array, collector in
+    func testThrowingConcurrentForEachThatThrows() async {
+        await runAsyncTest { array, collector in
             await self.verifyErrorThrown { error in
                 try await array.concurrentForEach { int in
                     try await collector.tryCollect(

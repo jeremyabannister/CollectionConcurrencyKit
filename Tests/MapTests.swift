@@ -8,15 +8,15 @@ import XCTest
 import CollectionConcurrencyKit
 
 final class MapTests: TestCase {
-    func testNonThrowingAsyncMap() {
-        runAsyncTest { array, collector in
+    func testNonThrowingAsyncMap() async {
+        await runAsyncTest { array, collector in
             let values = await array.asyncMap { await collector.collectAndTransform($0) }
             XCTAssertEqual(values, array.map(String.init))
         }
     }
 
-    func testThrowingAsyncMapThatDoesNotThrow() {
-        runAsyncTest { array, collector in
+    func testThrowingAsyncMapThatDoesNotThrow() async {
+        await runAsyncTest { array, collector in
             let values = try await array.asyncMap {
                 try await collector.tryCollectAndTransform($0)
             }
@@ -25,8 +25,8 @@ final class MapTests: TestCase {
         }
     }
 
-    func testThrowingAsyncMapThatThrows() {
-        runAsyncTest { array, collector in
+    func testThrowingAsyncMapThatThrows() async {
+        await runAsyncTest { array, collector in
             await self.verifyErrorThrown { error in
                 try await array.asyncMap { int in
                     try await collector.tryCollectAndTransform(
@@ -40,8 +40,8 @@ final class MapTests: TestCase {
         }
     }
 
-    func testNonThrowingConcurrentMap() {
-        runAsyncTest { array, collector in
+    func testNonThrowingConcurrentMap() async {
+        await runAsyncTest { array, collector in
             let values = await array.concurrentMap {
                 await collector.collectAndTransform($0)
             }
@@ -50,8 +50,8 @@ final class MapTests: TestCase {
         }
     }
 
-    func testThrowingConcurrentMapThatDoesNotThrow() {
-        runAsyncTest { array, collector in
+    func testThrowingConcurrentMapThatDoesNotThrow() async {
+        await runAsyncTest { array, collector in
             let values = try await array.concurrentMap {
                 try await collector.tryCollectAndTransform($0)
             }
@@ -60,8 +60,8 @@ final class MapTests: TestCase {
         }
     }
 
-    func testThrowingConcurrentMapThatThrows() {
-        runAsyncTest { array, collector in
+    func testThrowingConcurrentMapThatThrows() async {
+        await runAsyncTest { array, collector in
             await self.verifyErrorThrown { error in
                 try await array.concurrentMap { int in
                     try await collector.tryCollectAndTransform(

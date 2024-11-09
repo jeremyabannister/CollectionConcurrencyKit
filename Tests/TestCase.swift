@@ -16,7 +16,7 @@ class TestCase: XCTestCase {
     }
 
     func verifyErrorThrown<T>(
-        in file: StaticString = #file,
+        in file: StaticString = #filePath,
         at line: UInt = #line,
         from closure: (Error) async throws -> T
     ) async {
@@ -32,13 +32,14 @@ class TestCase: XCTestCase {
         }
     }
 
+    @MainActor
     func runAsyncTest(
         named testName: String = #function,
-        in file: StaticString = #file,
+        in file: StaticString = #filePath,
         at line: UInt = #line,
         withTimeout timeout: TimeInterval = 10,
         test: @escaping ([Int], Collector) async throws -> Void
-    ) {
+    ) async {
         // This method is needed since Linux doesn't yet support async test methods.
         var thrownError: Error?
         let errorHandler = { thrownError = $0 }
@@ -54,7 +55,7 @@ class TestCase: XCTestCase {
             expectation.fulfill()
         }
 
-        waitForExpectations(timeout: timeout)
+        await fulfillment(of: [expectation], timeout: timeout)
 
         if let error = thrownError {
             XCTFail("Async error thrown: \(error)", file: file, line: line)
@@ -64,7 +65,7 @@ class TestCase: XCTestCase {
 
 extension TestCase {
     // Note: This is not an actor because we want it to execute concurrently
-    class Collector {
+    final class Collector: @unchecked Sendable {
         var values = [Int]()
         private let queue = DispatchQueue(label: "Collector")
 
